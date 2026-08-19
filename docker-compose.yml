@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 1. Custom High-Contrast Apple-HIG Frontend (serves on public port 8378)
   librespeed-frontend:
