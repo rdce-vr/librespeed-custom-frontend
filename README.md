@@ -38,8 +38,6 @@ Your browser will connect to the **custom frontend** (mapping to your original p
 A pre-configured [`docker-compose.yml`](file:///C:/Users/kreshna.putra/.gemini/antigravity/scratch/speed-test/docker-compose.yml) file has been generated in the root of this folder. You can use it directly:
 
 ```yaml
-version: '3.8'
-
 services:
   # 1. Custom High-Contrast Apple-HIG Frontend (serves on public port 8378)
   librespeed-frontend:
