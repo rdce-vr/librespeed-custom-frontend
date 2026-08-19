@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # 1. Custom High-Contrast Apple-HIG Frontend (serves on public port 8378)
+  librespeed-frontend:
+    image: ghcr.io/<your-github-username>/librespeed-custom-frontend:latest
+    container_name: librespeed-frontend
+    ports:
+      - "8378:80" # Map host port 8378 to nginx port 80 (Drop-in replacement for the old web address!)
+    environment:
+      - BACKEND_HOST=speedtest
+      - BACKEND_PORT=8080
+    restart: always
+    depends_on:
+      - speedtest
+
+  # 2. Existing LibreSpeed Backend (Handles telemetry, obfuscation, and tests)
+  speedtest:
+    container_name: speedtest
+    image: ghcr.io/librespeed/speedtest:latest
+    restart: always
+    environment:
+      MODE: standalone
+      TITLE: RDCE-VR Server Test
+      TELEMETRY: enable
+      ENABLE_ID_OBFUSCATION: enable
+      PASSWORD: change-this-db-password
+      DISABLE_IPINFO: false
+      DISTANCE: km
+    # Note: Removed the host port mapping here so that the backend is private.
+    # Nginx will securely route all speed tests internally over the Docker network.
