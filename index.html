@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDCE-VR Server Test</title>
+<link rel="stylesheet" type="text/css" href="styling/results_animation.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body style="display: flex; align-items: center; justify-content: center; background: #07090e; height: 100vh; width: 100vw; overflow: hidden; margin: 0; padding: 0;">
+
+  <!-- Demo Preview Toggle Bar (Only for mockup testing) -->
+  <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; gap: 4px; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); font-family: 'Inter', sans-serif;">
+    <button id="toggleDesktopBtn" style="background: var(--blue); color: #fff; border: none; border-radius: 15px; padding: 6px 14px; cursor: pointer; font-family: inherit; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.25s ease;">Desktop View</button>
+    <button id="toggleMobileBtn" style="background: transparent; color: #fff; border: none; border-radius: 15px; padding: 6px 14px; cursor: pointer; font-family: inherit; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.25s ease;">Mobile Frame</button>
+  </div>
+
+  <!-- Device frame wrapper -->
+  <div id="deviceWrapper" class="desktop-mode">
+
+    <div class="app-container">
+
+      <!-- Stacks elements tightly at the top -->
+      <div class="main-content">
+
+        <div class="brand">
+          <div class="brand-title-wrap">
+            <h1>RDCE-VR Server Test</h1>
+          </div>
+          <div style="margin-left: auto; display: flex; align-items: center;">
+            <label for="themeToggleCheckbox" class="toggle">
+              <input type="checkbox" class="input" id="themeToggleCheckbox" style="display:none;" />
+              <div class="icon icon--moon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="icon icon--sun">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"></path>
+                </svg>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="server-selector-container">
+          <div class="server-selector" id="serverSelector">
+            <div class="server-chosen" id="serverChosen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px;"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              <span id="selectedServerName">Locating servers...</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px; margin-left:auto; transition: transform 0.2s;" id="chevron"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <ul class="server-list" id="serverList" style="display:none;"></ul>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-col ping" id="statPing">
+            <div class="stat-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 15l4-8 4 5 4-9 4 12"/></svg>
+              Ping
+            </div>
+            <div class="stat-value" id="pingVal">—</div>
+            <div class="stat-unit">ms</div>
+            <div class="stat-sub">Jitter<span id="jitterVal" style="display:block; margin-top:2px;">—</span></div>
+          </div>
+          <div class="stat-col download" id="statDown">
+            <div class="stat-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13M6 12l6 6 6-6"/></svg>
+              Download
+            </div>
+            <div class="stat-value pending" id="downVal">—</div>
+            <div class="stat-unit">Mb/s</div>
+            <div class="stat-sub">Loaded<span id="pingDownVal" style="display:block; margin-top:2px;">—</span></div>
+          </div>
+          <div class="stat-col upload" id="statUp">
+            <div class="stat-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V7M6 12l6-6 6 6"/></svg>
+              Upload
+            </div>
+            <div class="stat-value pending" id="upVal">—</div>
+            <div class="stat-unit">Mb/s</div>
+            <div class="stat-sub">Loaded<span id="pingUpVal" style="display:block; margin-top:2px;">—</span></div>
+          </div>
+        </div>
+
+        <div class="dial-section">
+          <div class="dial-wrap" id="dialWrap">
+            <svg class="dial" viewBox="0 0 400 400">
+              <defs>
+                <linearGradient id="ringGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="var(--ring-color-1, #007aff)"/>
+                  <stop offset="100%" stop-color="var(--ring-color-2, #8e8e93)"/>
+                </linearGradient>
+                <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="wideBlur"/>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="softCore"/>
+                  <feMerge>
+                    <feMergeNode in="wideBlur"/>
+                    <feMergeNode in="softCore"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <!-- Background track ring -->
+              <circle cx="200" cy="200" r="142" stroke="var(--hair)" stroke-width="3" fill="transparent"/>
+              <!-- Glowing dynamic sweep ring (replaces ticks) -->
+              <circle id="sweepRing" cx="200" cy="200" r="142" 
+                      stroke="url(#ringGradient)" stroke-width="6" fill="transparent"
+                      stroke-linecap="round" filter="url(#ringGlow)"
+                      style="transform-origin: 200px 200px; transform: rotate(-90deg); stroke-dasharray: 892; stroke-dashoffset: 892; transition: opacity 0.3s;"/>
+              <!-- Solid mask circle to absorb inward glow bleed -->
+              <circle cx="200" cy="200" r="138" fill="var(--page-bg)" style="transition: fill 0.25s ease;"/>
+              <!-- Ripple circles for idle animation -->
+              <circle id="rippleRing1" class="ripple-ring" cx="200" cy="200" r="142"/>
+              <circle id="rippleRing2" class="ripple-ring" cx="200" cy="200" r="142"/>
+            </svg>
+            <div class="dial-center">
+              <!-- Top Part: Speed and Unit -->
+              <div class="dial-value-wrap">
+                <span class="dial-value go-text" id="mainVal">GO</span>
+                <div class="dial-unit-wrap" id="dialUnitWrap" style="display:none;">
+                  <span class="dial-unit" id="dialUnit">Mb/s</span>
+                </div>
+              </div>
+              
+              <!-- Divider -->
+              <div class="dial-divider" id="dialDivider" style="display:none;"></div>
+              
+              <!-- Bottom Part: Arrow and State / Hint -->
+              <div class="dial-bottom-wrap">
+                <div class="dial-state-wrap" id="dialStateWrap" style="display:none;">
+                  <span class="dial-state-arrow" id="dialArrow"></span>
+                  <span class="dial-state-text" id="dialStateText">receiving data</span>
+                </div>
+                <div class="hint" id="hintLine">tap to test</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dedicated Connection Information Card -->
+          <div class="connection-card">
+            <div class="info-item">
+              <div class="info-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                Location
+              </div>
+              <div class="info-val" id="locLine">Locating...</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><circle cx="7" cy="7.5" r="1"/><circle cx="7" cy="16.5" r="1"/></svg>
+                Connection
+              </div>
+              <div class="info-val" id="ipLine">Detecting IP...</div>
+            </div>
+          </div>
+
+          <div class="privacy-note" id="privacyNote">
+            By clicking start, you agree to our <a href="#" id="viewPrivacyLink" style="color: var(--blue); text-decoration: underline;">Privacy Policy</a>.
+          </div>
+
+          <div style="text-align: center; margin-top: 8px; position: relative; z-index: 5;">
+            <button id="shareBtn" style="display: none; background: rgba(255,255,255,0.03); border: 1px solid var(--hair); color: var(--text-dim); border-radius: 12px; padding: 10px 20px; font-family: var(--font-body); font-size: 11px; text-transform: uppercase; cursor: pointer; transition: background-color 0.2s, color 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+              Share Results
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="wave-deco">
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="waveG1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--wave1-a)"/>
+              <stop offset="100%" stop-color="var(--wave1-b)"/>
+            </linearGradient>
+            <linearGradient id="waveG2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--wave2-a)"/>
+              <stop offset="100%" stop-color="var(--wave2-b)"/>
+            </linearGradient>
+            <linearGradient id="waveG3" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--wave3-a)"/>
+              <stop offset="100%" stop-color="var(--wave3-b)"/>
+            </linearGradient>
+          </defs>
+          <path class="wave-layer l1" fill="url(#waveG1)" opacity="0.55"
+            d="M0,120 C150,60 300,160 450,100 C600,40 750,140 800,90 L800,200 L0,200 Z"/>
+          <path class="wave-layer l2" fill="url(#waveG2)" opacity="0.7"
+            d="M0,150 C200,90 350,175 500,120 C650,70 750,150 800,110 L800,200 L0,200 Z"/>
+          <path class="wave-layer l3" fill="url(#waveG3)" opacity="0.9"
+            d="M0,172 C180,130 380,195 550,150 C680,118 760,168 800,140 L800,200 L0,200 Z"/>
+        </svg>
+      </div>
+
+      <!-- Detailed Result Card Container (Fades in when test finished) -->
+      <div class="result-card-container" id="resultCardContainer">
+        <div class="result-card" id="resultsCard">
+          <div class="result-card-header">
+            <div class="card-brand">RDCE-VR Server Test</div>
+            <div class="card-time" id="cardTime">—</div>
+          </div>
+          
+          <div class="result-card-speeds">
+            <div class="speed-box download">
+              <div class="speed-lbl">Download</div>
+              <div class="speed-num"><span id="cardDl">0.00</span> <span class="speed-unit-lbl">Mb/s</span></div>
+            </div>
+            <div class="speed-box upload">
+              <div class="speed-lbl">Upload</div>
+              <div class="speed-num"><span id="cardUl">0.00</span> <span class="speed-unit-lbl">Mb/s</span></div>
+            </div>
+          </div>
+          
+          <div class="result-card-stats">
+            <div class="card-stat-item">
+              <span class="card-stat-lbl">Ping</span>
+              <span class="card-stat-val" id="cardPing">—</span>
+            </div>
+            <div class="card-stat-item">
+              <span class="card-stat-lbl">Jitter</span>
+              <span class="card-stat-val" id="cardJitter">—</span>
+            </div>
+          </div>
+          
+          <div class="result-card-connection">
+            <div class="connection-row">
+              <span class="conn-lbl">Location</span>
+              <span class="conn-val" id="cardLoc">—</span>
+            </div>
+            <div class="connection-row">
+              <span class="conn-lbl">IP / Provider</span>
+              <span class="conn-val" id="cardIp">—</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="result-actions">
+          <button class="action-btn" id="copyImgBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:6px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Image
+          </button>
+          <button class="action-btn" id="backBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:6px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back
+          </button>
+          <button class="action-btn" id="retestBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            Test Again
+          </button>
+        </div>
+      </div>
+
+      <footer>demo mode — results are simulated locally, no test traffic is sent</footer>
+
+    </div>
+
+  </div>
+
+<!-- Privacy Policy Dialog -->
+<div class="modal-overlay" id="privacyModal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="font-family: var(--font-display); font-weight: 700;">Privacy Policy</h2>
+      <button class="modal-close" id="closePrivacyBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 12px;">This speed test server is configured with telemetry enabled.</p>
+      <h3>What data we collect</h3>
+      <p>At the end of the test, the following data is collected and stored:</p>
+      <ul>
+        <li>Test ID</li>
+        <li>Time of testing</li>
+        <li>Test results (download and upload speed, ping and jitter)</li>
+        <li>IP address, ISP information, and approximate location</li>
+        <li>User agent and browser locale</li>
+        <li>Test log (contains no personal information)</li>
+      </ul>
+      <h3>How we use the data</h3>
+      <p>Data collected through this service is used to allow sharing of test results (sharable images) and to diagnose network issues. No personal information is disclosed to third parties.</p>
+      <h3>Data removal</h3>
+      <p>If you want your information deleted, contact the server administrator or write to: <a href="mailto:telemetry@example.com" style="color: var(--green);">telemetry@example.com</a>.</p>
+    </div>
+    <div style="text-align: right; margin-top: 20px;">
+      <button class="modal-action-btn" id="closePrivacyBtn2">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Results Sharing Dialog -->
+<div class="modal-overlay" id="shareModal" style="display:none;">
+  <div class="modal-content" style="max-width: 440px; padding: 16px;">
+    <div class="modal-header" style="margin-bottom: 12px;">
+      <h2 style="font-family: var(--font-display); font-weight: 700; font-size: 16px;">Share Results</h2>
+      <button class="modal-close" id="closeShareBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Embedded Scorecard Card -->
+      <div class="result-card" id="modalResultsCard" style="margin-bottom: 16px; box-shadow: none; border: 1px solid var(--hair);">
+        <div class="result-card-header">
+          <div class="card-brand">RDCE-VR Server Test</div>
+          <div class="card-time" id="modalCardTime">—</div>
+        </div>
+        
+        <div class="result-card-speeds">
+          <div class="speed-box download">
+            <div class="speed-lbl">Download</div>
+            <div class="speed-num"><span id="modalCardDl">0.00</span> <span class="speed-unit-lbl">Mb/s</span></div>
+          </div>
+          <div class="speed-box upload">
+            <div class="speed-lbl">Upload</div>
+            <div class="speed-num"><span id="modalCardUl">0.00</span> <span class="speed-unit-lbl">Mb/s</span></div>
+          </div>
+        </div>
+        
+        <div class="result-card-stats">
+          <div class="card-stat-item">
+            <span class="card-stat-lbl">Ping</span>
+            <span class="card-stat-val" id="modalCardPing">—</span>
+          </div>
+          <div class="card-stat-item">
+            <span class="card-stat-lbl">Jitter</span>
+            <span class="card-stat-val" id="modalCardJitter">—</span>
+          </div>
+        </div>
+        
+        <div class="result-card-connection">
+          <div class="connection-row">
+            <span class="conn-lbl">Location</span>
+            <span class="conn-val" id="modalCardLoc">—</span>
+          </div>
+          <div class="connection-row">
+            <span class="conn-lbl">IP / Provider</span>
+            <span class="conn-val" id="modalCardIp">—</span>
+          </div>
+        </div>
+      </div>
+      <button class="modal-action-btn" id="copyLinkBtn">Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const dialWrap = $('dialWrap');
+  const mainVal = $('mainVal');
+  const dialUnit = $('dialUnit');
+  const dialUnitWrap = $('dialUnitWrap');
+  const dialArrow = $('dialArrow');
+  const hintLine = $('hintLine');
+  const locLine = $('locLine');
+  const ipLine = $('ipLine');
+  const sweepRing = $('sweepRing');
+  const rippleRing1 = $('rippleRing1');
+  const rippleRing2 = $('rippleRing2');
+  
+  const resultCardContainer = $('resultCardContainer');
+  const cardTime = $('cardTime');
+  const cardDl = $('cardDl');
+  const cardUl = $('cardUl');
+  const cardPing = $('cardPing');
+  const cardJitter = $('cardJitter');
+  const cardLoc = $('cardLoc');
+  const cardIp = $('cardIp');
+  const copyImgBtn = $('copyImgBtn');
+  const backBtn = $('backBtn');
+  const retestBtn = $('retestBtn');
+  
+  // Modal Scorecard Elements
+  const modalCardTime = $('modalCardTime');
+  const modalCardDl = $('modalCardDl');
+  const modalCardUl = $('modalCardUl');
+  const modalCardPing = $('modalCardPing');
+  const modalCardJitter = $('modalCardJitter');
+  const modalCardLoc = $('modalCardLoc');
+  const modalCardIp = $('modalCardIp');
+  
+
+  // ---- Mock Preview Frame Controls ----
+  const toggleDesktopBtn = $('toggleDesktopBtn');
+  const toggleMobileBtn = $('toggleMobileBtn');
+  const deviceWrapper = $('deviceWrapper');
+  
+  if (toggleDesktopBtn && toggleMobileBtn && deviceWrapper) {
+    toggleDesktopBtn.addEventListener('click', () => {
+      deviceWrapper.className = 'desktop-mode';
+      toggleDesktopBtn.style.background = 'var(--blue)';
+      toggleDesktopBtn.style.color = '#fff';
+      toggleMobileBtn.style.background = 'transparent';
+      toggleMobileBtn.style.color = '#fff';
+    });
+    toggleMobileBtn.addEventListener('click', () => {
+      deviceWrapper.className = 'mobile-mode';
+      toggleMobileBtn.style.background = 'var(--blue)';
+      toggleMobileBtn.style.color = '#fff';
+      toggleDesktopBtn.style.background = 'transparent';
+      toggleDesktopBtn.style.color = '#fff';
+    });
+  }
+
+  // ---- Mock Server List for offline testing ----
+  const serverList = [
+    { name: "Semarang, Central Java, ID", ip: "182.4.211.87 · Indosat IOH" },
+    { name: "Singapore - AWS Cloud", ip: "54.254.12.19 · Amazon.com" },
+    { name: "Tokyo, Japan - Linode", ip: "139.162.65.41 · Akamai" }
+  ];
+  let currentServer = null;
+
+  function populateServerSelector() {
+    const listEl = $('serverList');
+    listEl.innerHTML = '';
+    
+    serverList.forEach((srv) => {
+      const li = document.createElement('li');
+      li.className = 'server-item';
+      li.textContent = srv.name;
+      li.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectServer(srv);
+        listEl.style.display = 'none';
+        $('chevron').style.transform = 'rotate(0deg)';
+      });
+      listEl.appendChild(li);
+    });
+    
+    if (serverList.length > 1) {
+      selectServer(serverList[0]);
+      $('chevron').style.display = 'block';
+    } else if (serverList.length === 1) {
+      selectServer(serverList[0]);
+      $('chevron').style.display = 'none';
+    } else {
+      $('selectedServerName').textContent = 'No servers available';
+      $('chevron').style.display = 'none';
+    }
+  }
+
+  function selectServer(srv) {
+    currentServer = srv;
+    $('selectedServerName').textContent = srv.name;
+    locLine.textContent = srv.name;
+    ipLine.textContent = srv.ip;
+  }
+
+  // ---- Server Selector Dropdown Toggle ----
+  const serverSelector = $('serverSelector');
+  const serverListEl = $('serverList');
+  const chevron = $('chevron');
+  
+  if (serverSelector) {
+    serverSelector.addEventListener('click', (e) => {
+      if (running || serverList.length <= 1) return;
+      e.stopPropagation();
+      const isOpen = serverListEl.style.display === 'block';
+      serverListEl.style.display = isOpen ? 'none' : 'block';
+      chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+  }
+  
+  document.addEventListener('click', () => {
+    if (serverListEl) {
+      serverListEl.style.display = 'none';
+      chevron.style.transform = 'rotate(0deg)';
+    }
+  });
+
+  // ---- theme management icon toggle ----
+  const themeToggleCheckbox = $('themeToggleCheckbox');
+  
+  function getTheme() {
+    return localStorage.getItem('speedtest-theme') || 
+           (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('speedtest-theme', theme);
+    if (themeToggleCheckbox) {
+      themeToggleCheckbox.checked = (theme === 'light');
+    }
+    resetDefaultRingGradient(theme);
+  }
+  
+  if (themeToggleCheckbox) {
+    themeToggleCheckbox.addEventListener('change', () => {
+      const nextTheme = themeToggleCheckbox.checked ? 'light' : 'dark';
+      setTheme(nextTheme);
+    });
+  }
+  
+  setTheme(getTheme());
+
+  // ---- ring gradient helper ----
+  function setRingGradient(c1, c2) {
+    document.documentElement.style.setProperty('--ring-color-1', c1);
+    document.documentElement.style.setProperty('--ring-color-2', c2);
+  }
+  
+  function resetDefaultRingGradient(theme) {
+    const activeTheme = theme || getTheme();
+    if (activeTheme === 'light') {
+      setRingGradient('#c7c7cc', '#8e8e93');
+    } else {
+      setRingGradient('#3a3a3c', '#1c1c1e');
+    }
+  }
+
+  let rafId = null;
+  let currentScale = 0.8;
+  let currentNorm = 0;
+  let animState = { active:false, targetNorm:0, colorful:false, targetScale:0.8 };
+
+  function tickFrame(t){
+    const targetScale = animState.targetScale;
+    currentScale += (targetScale - currentScale) * 0.08;
+    if (Math.abs(targetScale - currentScale) < 0.001) currentScale = targetScale;
+
+    const targetNorm = animState.targetNorm || 0;
+    currentNorm += (targetNorm - currentNorm) * 0.08;
+    if (Math.abs(targetNorm - currentNorm) < 0.001) currentNorm = targetNorm;
+
+    if (sweepRing) {
+      if (!running) {
+        // Idle breathing pulse animation (opacity wave)
+        const breathing = 0.28 + 0.16 * Math.sin(t * 0.0025);
+        sweepRing.style.opacity = breathing.toFixed(3);
+        sweepRing.setAttribute('stroke-width', '3.0');
+        
+        // Scale breathes slightly around currentScale
+        const scaleBreathing = currentScale + 0.012 * Math.sin(t * 0.0025);
+        dialWrap.style.transform = `scale(${scaleBreathing.toFixed(3)})`;
+        
+        // Solid background glow setup
+        const glowFilter = $('ringGlow');
+        if (glowFilter) {
+          const stdDevs = glowFilter.querySelectorAll('feGaussianBlur');
+          if (stdDevs.length >= 2) {
+            stdDevs[0].setAttribute('stdDeviation', '6.0');
+            stdDevs[1].setAttribute('stdDeviation', '1.5');
+          }
+        }
+        
+        // Full circular layout
+        sweepRing.style.strokeDashoffset = '0';
+        
+        // Very slow, relaxing idle rotation
+        const deg = ((t % 6500) / 6500) * 360;
+        sweepRing.style.transform = `rotate(${deg - 90}deg)`;
+      } else {
+        sweepRing.style.opacity = '1.0'; // Stay visible when running
+        dialWrap.style.transform = `scale(${currentScale.toFixed(3)})`;
+        
+        // Dynamic thickness based on speed (Uiverse spin inspiration)
+        const strokeW = 3.0 + 7.0 * currentNorm;
+        sweepRing.setAttribute('stroke-width', strokeW.toFixed(1));
+        
+        // stdDeviation of wideBlur and softCore filters (blends outer edges dynamically)
+        const glowFilter = $('ringGlow');
+        if (glowFilter) {
+          const stdDevs = glowFilter.querySelectorAll('feGaussianBlur');
+          if (stdDevs.length >= 2) {
+            const wideBlurAmt = 6 + 12 * currentNorm;
+            stdDevs[0].setAttribute('stdDeviation', wideBlurAmt.toFixed(1));
+            const coreBlurAmt = 1.5 + 1.7 * currentNorm;
+            stdDevs[1].setAttribute('stdDeviation', coreBlurAmt.toFixed(1));
+          }
+        }
+
+        // Draw progress sweep
+        let progress = 1;
+        if (animState.isPingSweep) {
+          progress = animState.pingSweepProgress !== undefined ? animState.pingSweepProgress : 1;
+        } else if (!animState.active && currentScale === 0) {
+          progress = 0;
+        }
+        
+        const offset = 892 * (1 - progress);
+        sweepRing.style.strokeDashoffset = offset.toFixed(1);
+        
+        // Continuous spinning rotation animation (Uiverse infinite spin inspiration)
+        const spinDuration = animState.active ? 1400 : 2200; // ms per spin
+        const deg = ((t % spinDuration) / spinDuration) * 360;
+        sweepRing.style.transform = `rotate(${deg - 90}deg)`;
+      }
+    }
+    
+    rafId = requestAnimationFrame(tickFrame);
+  }
+  rafId = requestAnimationFrame(tickFrame);
+
+  function setDial(v, unit, decimals = 2){
+    mainVal.textContent = v.toFixed(decimals);
+    if(dialUnit) dialUnit.textContent = unit;
+  }
+  const rand = (min,max) => min + Math.random()*(max-min);
+  const sleep = ms => new Promise(res=>setTimeout(res, ms));
+
+  // ---- Privacy Modal Logic ----
+  const viewPrivacyLink = $('viewPrivacyLink');
+  const privacyModal = $('privacyModal');
+  const closePrivacyBtn = $('closePrivacyBtn');
+  const closePrivacyBtn2 = $('closePrivacyBtn2');
+  
+  if (viewPrivacyLink && privacyModal) {
+    viewPrivacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      privacyModal.style.display = 'flex';
+    });
+  }
+  
+  [closePrivacyBtn, closePrivacyBtn2].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        privacyModal.style.display = 'none';
+      });
+    }
+  });
+
+  // ---- Share Action Logic ----
+  const shareBtn = $('shareBtn');
+  
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      document.querySelector('.app-container').classList.add('finished-state');
+    });
+  }
+
+
+  // ---- Simulation Execution ----
+  async function simulatePhase({ target, duration, jitterPct, onTick, tickMs=90 }){
+    const start = performance.now();
+    let elapsed = 0;
+    while(elapsed < duration){
+      await sleep(tickMs);
+      elapsed = performance.now() - start;
+      const t = Math.min(1, elapsed/duration);
+      const ramp = 1 - Math.pow(1-t, 3);
+      const wobble = (1 - t*0.7) * rand(-jitterPct, jitterPct);
+      const value = Math.max(0, target * ramp * (1 + wobble));
+      onTick(value, t);
+    }
+    onTick(target, 1);
+  }
+
+  async function simulatePing(){
+    hintLine.textContent = '';
+    setRingGradient('#ffffff', '#8e8e93'); // White/Silver Ping gradient
+    
+    // Display "connecting..." with the connecting-text style, hiding measurement units and divider
+    mainVal.textContent = 'connecting';
+    mainVal.className = 'dial-value connecting-text';
+    $('dialUnitWrap').style.display = 'none';
+    $('dialDivider').style.display = 'none';
+    $('dialStateWrap').style.display = 'none';
+    
+    animState = { active:true, targetNorm:0, colorful:false, targetScale:1, isPingSweep:true, pingSweepProgress:0 };
+    
+    const totalDuration = 1200;
+    const start = performance.now();
+    const baseline = rand(6, 34);
+    const samples = [];
+    
+    while (performance.now() - start < totalDuration) {
+      const elapsed = performance.now() - start;
+      const t = Math.min(1, elapsed / totalDuration);
+      animState.pingSweepProgress = t;
+      
+      // Periodically update the top stats row in the background
+      const expectedSamples = Math.floor(elapsed / 150) + 1;
+      if (samples.length < expectedSamples && samples.length < 8) {
+        const jitterAmt = rand(0.3, 3.2);
+        const val = Math.max(1, baseline + rand(-jitterAmt, jitterAmt));
+        samples.push(val);
+        const avg = samples.reduce((a,b)=>a+b,0)/samples.length;
+        $('pingVal').textContent = avg.toFixed(1);
+      }
+      
+      await sleep(16);
+    }
+    
+    animState.pingSweepProgress = 1;
+    
+    // Fill remaining samples if any
+    while (samples.length < 8) {
+      samples.push(baseline + rand(-1.2, 1.2));
+    }
+    const jitter = calculateJitter(samples);
+    $('jitterVal').textContent = jitter.toFixed(1) + ' ms';
+    
+    // Stop sweep filter so ticks stay rendered and transition color during Download
+    animState.isPingSweep = false;
+  }
+
+  function calculateJitter(samples) {
+    if (samples.length < 2) return 0;
+    let sum = 0;
+    for (let i = 1; i < samples.length; i++) {
+      sum += Math.abs(samples[i] - samples[i-1]);
+    }
+    return sum / (samples.length - 1);
+  }
+
+  async function simulateDownload(){
+    const target = rand(60, 480);
+    $('downVal').classList.remove('pending');
+    setRingGradient('#007aff', '#00c7fc'); // Apple Blue/Teal gradient
+    animState = { active:true, targetNorm:0, colorful:true, targetScale:1 };
+    
+    // Show unit wrap (with fade transition), divider, and state elements below speed
+    const unitWrap = $('dialUnitWrap');
+    unitWrap.style.display = 'flex';
+    unitWrap.style.opacity = '0';
+    void unitWrap.offsetWidth; // force DOM reflow
+    unitWrap.style.transition = 'opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)';
+    unitWrap.style.opacity = '1';
+    
+    $('dialDivider').style.display = 'block';
+    $('dialStateWrap').style.display = 'flex';
+    dialArrow.textContent = '↓';
+    dialArrow.style.color = 'var(--blue)';
+    $('dialStateText').textContent = 'receiving data';
+    
+    const idlePing = parseFloat($('pingVal').textContent) || 15;
+    const loadedPings = [];
+
+    await simulatePhase({
+      target, duration:4200, jitterPct:0.10,
+      onTick:(v, t)=>{
+        setDial(v, 'Mb/s');
+        const speedLog = Math.log10(v + 1);
+        animState.targetNorm = Math.min(1, speedLog / 3.0);
+        $('downVal').textContent = v.toFixed(2);
+        if (Math.random() < 0.25) {
+          const lp = idlePing + rand(10, 40) * (0.6 + 0.4 * Math.sin(t * Math.PI));
+          loadedPings.push(lp);
+          $('pingDownVal').textContent = lp.toFixed(1) + ' ms';
+        }
+      }
+    });
+    $('downVal').textContent = target.toFixed(2);
+    const finalLoadedDown = loadedPings.reduce((a,b)=>a+b, idlePing + rand(15, 30)) / (loadedPings.length || 1);
+    $('pingDownVal').textContent = finalLoadedDown.toFixed(1) + ' ms';
+    return target;
+  }
+
+  async function simulateUpload(){
+    const target = rand(15, 180);
+    const upEl = $('upVal');
+    upEl.classList.remove('pending');
+    setRingGradient('#34c759', '#30d158'); // Apple Green gradient
+    animState = { active:true, targetNorm:0, colorful:true, targetScale:1 };
+    
+    // Show unit wrap (with fade transition), divider, and state elements below speed
+    const unitWrap = $('dialUnitWrap');
+    unitWrap.style.display = 'flex';
+    unitWrap.style.opacity = '0';
+    void unitWrap.offsetWidth; // force DOM reflow
+    unitWrap.style.transition = 'opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)';
+    unitWrap.style.opacity = '1';
+    
+    $('dialDivider').style.display = 'block';
+    $('dialStateWrap').style.display = 'flex';
+    dialArrow.textContent = '↑';
+    dialArrow.style.color = 'var(--green)';
+    $('dialStateText').textContent = 'sending data';
+    
+    const idlePing = parseFloat($('pingVal').textContent) || 15;
+    const loadedPings = [];
+
+    await simulatePhase({
+      target, duration:3600, jitterPct:0.14,
+      onTick:(v, t)=>{
+        setDial(v, 'Mb/s');
+        const speedLog = Math.log10(v + 1);
+        animState.targetNorm = Math.min(1, speedLog / 3.0);
+        upEl.textContent = v.toFixed(2);
+        if (Math.random() < 0.25) {
+          const lp = idlePing + rand(25, 95) * (0.5 + 0.5 * Math.sin(t * Math.PI));
+          loadedPings.push(lp);
+          $('pingUpVal').textContent = lp.toFixed(1) + ' ms';
+        }
+      }
+    });
+    upEl.textContent = target.toFixed(2);
+    const finalLoadedUp = loadedPings.reduce((a,b)=>a+b, idlePing + rand(40, 75)) / (loadedPings.length || 1);
+    $('pingUpVal').textContent = finalLoadedUp.toFixed(1) + ' ms';
+    return target;
+  }
+
+  function animateFadeToValue(newValue, customClass, duration, callback) {
+    const unitWrap = $('dialUnitWrap');
+    mainVal.style.transition = `opacity ${duration / 2.2}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+    mainVal.style.opacity = '0';
+    if (unitWrap && unitWrap.style.display !== 'none') {
+      unitWrap.style.transition = `opacity ${duration / 2.2}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+      unitWrap.style.opacity = '0';
+    }
+    
+    setTimeout(() => {
+      mainVal.textContent = newValue;
+      mainVal.className = 'dial-value ' + (customClass || '');
+      
+      // Hide unit wrap immediately if transitioning to transition states
+      if (newValue === 'connecting' || newValue === 'finalizing' || newValue === 'GO' || newValue === '0.00') {
+        if (unitWrap) {
+          unitWrap.style.display = 'none';
+          unitWrap.style.opacity = '0';
+        }
+      }
+      
+      mainVal.style.opacity = '1';
+      
+      setTimeout(() => {
+        mainVal.style.opacity = '';
+        mainVal.style.transition = '';
+        if (unitWrap) {
+          unitWrap.style.transition = '';
+        }
+        if (callback) callback();
+      }, duration / 2.2);
+    }, duration / 2.2);
+  }
+
+  let rippleTimer = null;
+  
+  function triggerRipple(el) {
+    if (!el) return;
+    el.classList.remove('ripple-trigger');
+    void el.offsetWidth; // Force DOM layout reflow to reset CSS animation keyframes
+    el.classList.add('ripple-trigger');
+    
+    setTimeout(() => {
+      el.classList.remove('ripple-trigger');
+    }, 3500); // Duration matches CSS keyframes (3.5s)
+  }
+  
+  function startRippleScheduler() {
+    if (rippleTimer) clearInterval(rippleTimer);
+    
+    // Evaluate and trigger ripples dynamically when idle
+    rippleTimer = setInterval(() => {
+      if (running) return;
+      
+      const isDouble = Math.random() < 0.45; // 45% chance for double ripple
+      
+      triggerRipple(rippleRing1);
+      if (isDouble) {
+        setTimeout(() => {
+          if (!running) triggerRipple(rippleRing2);
+        }, 650); // Slower double ripple offset spacing
+      }
+    }, 5800); // Slower interval between evaluations (5.8s)
+  }
+
+  let running = false;
+
+  async function runTest(){
+    if(running) return;
+    running = true;
+    rippleRing1.classList.remove('ripple-trigger');
+    rippleRing2.classList.remove('ripple-trigger');
+    $('shareBtn').style.display = 'none';
+
+    // Reset UI
+    $('pingVal').textContent = '—';
+    $('jitterVal').textContent = '—';
+    $('downVal').textContent = '—'; $('downVal').classList.add('pending');
+    $('pingDownVal').textContent = '—';
+    const upEl = $('upVal');
+    upEl.textContent = '—'; upEl.classList.add('pending');
+    $('pingUpVal').textContent = '—';
+    
+    // Switch to active size and reset status line
+    animState.targetScale = 1.0;
+    animState.targetNorm = 0;
+    hintLine.textContent = '';
+    
+    setDial(0, 'Mb/s');
+
+    try{
+      await simulatePing();
+      
+      // Pause 1s after Ping with fadeout visual transition to 0.00
+      hintLine.textContent = 'Preparing download...';
+      await new Promise(resolve => animateFadeToValue('0.00', '', 1000, resolve));
+      hintLine.textContent = '';
+      
+      const dl = await simulateDownload();
+      
+      // Pause 1s after Download with fadeout visual transition to 0.00
+      hintLine.textContent = 'Preparing upload...';
+      $('dialDivider').style.display = 'none';
+      $('dialStateWrap').style.display = 'none';
+      animState.targetNorm = 0;
+      await new Promise(resolve => animateFadeToValue('0.00', '', 1000, resolve));
+      hintLine.textContent = '';
+      
+      const ul = await simulateUpload();
+      
+      // Pause 1s after Upload with fadeout visual transition to finalizing
+      hintLine.textContent = '';
+      $('dialDivider').style.display = 'none';
+      $('dialStateWrap').style.display = 'none';
+      await new Promise(resolve => animateFadeToValue('finalizing', 'connecting-text', 1000, () => {
+        $('dialUnitWrap').style.display = 'none';
+        resolve();
+      }));
+      
+      // Update Detailed Result Card values (Main Page)
+      cardDl.textContent = dl.toFixed(2);
+      cardUl.textContent = ul.toFixed(2);
+      cardPing.textContent = parseFloat($('pingVal').textContent).toFixed(1) + ' ms';
+      cardJitter.textContent = parseFloat($('jitterVal').textContent.replace(/[^\d.]/g, '')).toFixed(1) + ' ms';
+      cardLoc.textContent = locLine.textContent;
+      cardIp.textContent = ipLine.textContent;
+      
+      const now = new Date();
+      const timeOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+      const formattedTime = now.toLocaleDateString('en-US', timeOptions);
+      cardTime.textContent = formattedTime;
+      
+      // Update Detailed Result Card values (Modal Page)
+      modalCardDl.textContent = dl.toFixed(2);
+      modalCardUl.textContent = ul.toFixed(2);
+      modalCardPing.textContent = parseFloat($('pingVal').textContent).toFixed(1) + ' ms';
+      modalCardJitter.textContent = parseFloat($('jitterVal').textContent.replace(/[^\d.]/g, '')).toFixed(1) + ' ms';
+      modalCardLoc.textContent = locLine.textContent;
+      modalCardIp.textContent = ipLine.textContent;
+      modalCardTime.textContent = formattedTime;
+      
+      // Animate transition: hide dial/stats, reveal detailed scorecard in center
+      document.querySelector('.app-container').classList.add('finished-state');
+      
+      // Show "Share Results" button
+      $('shareBtn').style.display = 'inline-block';
+      hintLine.textContent = 'tap to test';
+      
+      // 4. Retract Sweep 100% to 0% after Upload
+      animState.isPingSweep = true;
+      animState.pingSweepProgress = 1;
+      const retractDuration = 500;
+      const retractStart = performance.now();
+      while (performance.now() - retractStart < retractDuration) {
+        const elapsed = performance.now() - retractStart;
+        animState.pingSweepProgress = Math.max(0, 1 - (elapsed / retractDuration));
+        await sleep(16);
+      }
+      animState.pingSweepProgress = 0;
+    } finally {
+      animState.targetScale = 0.8; // Shrink dial back to compact state
+      animState.targetNorm = 0;
+      animState.isPingSweep = false;
+      running = false;
+      resetDefaultRingGradient();
+      
+      // Ensure GO button text and visibility are correct
+      mainVal.textContent = 'GO';
+      mainVal.className = 'dial-value go-text';
+      $('dialUnitWrap').style.display = 'none';
+      $('dialDivider').style.display = 'none';
+      $('dialStateWrap').style.display = 'none';
+      $('dialArrow').textContent = '';
+      hintLine.textContent = 'tap to test';
+      triggerRipple(rippleRing1);
+    }
+  }
+
+  dialWrap.addEventListener('click', runTest);
+
+  // Copy card as image click listener
+  copyImgBtn.onclick = () => {
+    const originalContent = copyImgBtn.innerHTML;
+    copyImgBtn.disabled = true;
+    copyImgBtn.innerHTML = `Copying...`;
+    
+    // Choose rendering background based on document theme
+    const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+    const cardBg = isLightTheme ? '#ffffff' : '#0e111a';
+    
+    html2canvas(document.getElementById('resultsCard'), {
+      backgroundColor: cardBg,
+      scale: 2,
+      logging: false,
+      useCORS: true
+    }).then(canvas => {
+      canvas.toBlob(blob => {
+        if (!blob) {
+          throw new Error('Blob creation failed');
+        }
+        navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]).then(() => {
+          copyImgBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" style="width:14px; height:14px; margin-right:6px;"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+          setTimeout(() => {
+            copyImgBtn.innerHTML = originalContent;
+            copyImgBtn.disabled = false;
+          }, 2000);
+        }).catch(err => {
+          console.error('Clipboard write failed, downloading instead:', err);
+          // Fallback download
+          const link = document.createElement('a');
+          link.download = 'speedtest-results.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          copyImgBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" style="width:14px; height:14px; margin-right:6px;"><polyline points="20 6 9 17 4 12"/></svg> Downloaded!`;
+          setTimeout(() => {
+            copyImgBtn.innerHTML = originalContent;
+            copyImgBtn.disabled = false;
+          }, 2000);
+        });
+      }, 'image/png');
+    }).catch(err => {
+      console.error('html2canvas error:', err);
+      copyImgBtn.innerHTML = `Error Copying`;
+      setTimeout(() => {
+        copyImgBtn.innerHTML = originalContent;
+        copyImgBtn.disabled = false;
+      }, 2000);
+    });
+  };
+
+  // Back button click listener
+  backBtn.onclick = () => {
+    document.querySelector('.app-container').classList.remove('finished-state');
+    setTimeout(() => {
+      triggerRipple(rippleRing1);
+    }, 350);
+  };
+
+  // Test again click listener
+  retestBtn.onclick = () => {
+    document.querySelector('.app-container').classList.remove('finished-state');
+    setTimeout(() => {
+      runTest();
+    }, 450);
+  };
+  
+  // Initialize server selector and start periodic ripple scheduler
+  populateServerSelector();
+  startRippleScheduler();
+  triggerRipple(rippleRing1); // Trigger immediate single wave on load
+})();
+</script>
+
+</body>
+</html>

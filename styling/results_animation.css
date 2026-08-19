@@ -1,0 +1,1063 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+
+html[data-theme="dark"]{
+  --page-bg:#09090b; /* Apple OLED off-black */
+  --card-bg-1:#1c1c1e; /* Apple System Gray 6 */
+  --card-bg-2:#2c2c2e; /* Apple System Gray 5 */
+  --card-bg-3:#3a3a3c; /* Apple System Gray 4 */
+  --card-glow:rgba(255, 255, 255, 0.01);
+  --text:#ffffff;
+  --text-dim:#8e8e93; /* Apple System Gray */
+  --text-faint:#48484a; /* Apple System Gray 4 */
+  --hair:rgba(255, 255, 255, 0.08); /* Apple hairline divider */
+  --tick-idle:rgba(255, 255, 255, 0.12);
+  --tick-ping:rgba(255, 255, 255, 0.4);
+  --card-shadow:rgba(0,0,0,0.5);
+  --footer-color:rgba(255, 255, 255, 0.35);
+
+  /* Clean, monochromatic structural waves */
+  --wave1-a:#1c1c1e; --wave1-b:#2c2c2e;
+  --wave2-a:#0e0e11; --wave2-b:#1c1c1e;
+  --wave3-a:#16161a; --wave3-b:#2c2c2e;
+}
+
+html[data-theme="light"]{
+  --page-bg:#f2f2f7; /* Apple iOS System Background */
+  --card-bg-1:#ffffff; /* Apple White Card */
+  --card-bg-2:#f2f2f7;
+  --card-bg-3:#e5e5ea; /* Apple iOS Gray 6 */
+  --card-glow:rgba(0, 0, 0, 0.01);
+  --text:#000000;
+  --text-dim:#48484a; /* Darker Apple System Gray 2 for strong visibility */
+  --text-faint:#6c6c70; /* Darker Apple System Gray 3 for readable footnotes/labels */
+  --hair:rgba(0, 0, 0, 0.12); /* Slightly darker hairline divider */
+  --tick-idle:rgba(0, 0, 0, 0.12);
+  --tick-ping:rgba(0, 0, 0, 0.35);
+  --card-shadow:rgba(0,0,0,0.08);
+  --footer-color:rgba(0, 0, 0, 0.65); /* More visible footer text */
+
+  /* Darker, high-contrast monochrome structural waves */
+  --wave1-a:#d1d1d6; --wave1-b:#e5e5ea;
+  --wave2-a:#e5e5ea; --wave2-b:#f2f2f7;
+  --wave3-a:#f2f2f7; --wave3-b:#ffffff;
+}
+
+:root{
+  /* Apple HIG System Palette */
+  --pink:#ff2d55; /* iOS Red/Pink */
+  --blue:#007aff; /* iOS Blue */
+  --green:#34c759; /* iOS Green */
+  --yellowgreen:#ac8e00;
+
+  /* Google Fonts Stack with system fallbacks */
+  --font-display: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  --font-body: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  --font-mono: 'JetBrains Mono', "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+html,body{ height:100vh; min-height:100vh; overflow:hidden; background:var(--page-bg); font-family:var(--font-body); transition:background 0.25s ease; }
+
+body{
+  display:flex;
+  flex-direction:column;
+}
+
+.app-container{
+  position:relative;
+  width:100%;
+  height:100vh;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  background:var(--page-bg);
+  color:var(--text);
+  transition: background 0.25s ease;
+}
+
+/* ---- content wrapper to stack components tightly ---- */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex-grow: 1;
+  justify-content: flex-start;
+  z-index: 5;
+}
+
+/* ---- top brand strip / single header ---- */
+.brand{
+  display:flex; align-items:center; gap:8px;
+  padding:20px 24px 8px;
+  max-width:800px;
+  width:100%;
+  margin:0 auto;
+}
+.brand-title-wrap {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand-title-wrap h1 {
+  font-family:var(--font-display);
+  font-size:clamp(15px, 3.2vmin, 18px);
+  font-weight:700;
+  letter-spacing:-0.02em;
+  color:var(--text);
+}
+
+/* ---- Uiverse.io glassmorphic theme toggle ---- */
+.toggle {
+  background: var(--card-bg-1);
+  border: 1px solid var(--hair);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.25s, border-color 0.25s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.toggle:hover {
+  background: var(--card-bg-2);
+  transform: scale(1.04);
+}
+html[data-theme="light"] .toggle {
+  background: #ffffff;
+}
+
+.input {
+  display: none;
+}
+
+.icon {
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.icon--moon {
+  color: var(--text-dim);
+}
+
+.icon--sun {
+  transform: scale(0) rotate(-180deg);
+  color: #ff9f0a; /* Apple gold */
+}
+
+#themeToggleCheckbox:checked + .icon--moon {
+  transform: scale(0) rotate(180deg);
+  opacity: 0;
+}
+
+#themeToggleCheckbox:checked ~ .icon--sun {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+
+/* ---- server selector ---- */
+.server-selector-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 4px auto 0;
+  padding: 0 24px;
+  position: relative;
+  z-index: 10;
+}
+.server-selector {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--card-bg-1);
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.server-selector:hover {
+  background: var(--card-bg-2);
+}
+html[data-theme="light"] .server-selector {
+  background: #ffffff;
+}
+.server-chosen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: var(--text-dim);
+}
+.server-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg-1);
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  list-style: none;
+  padding: 6px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+html[data-theme="light"] .server-list {
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.server-item {
+  padding: 10px 16px;
+  color: var(--text-dim);
+  transition: background-color 0.2s, color 0.2s;
+}
+.server-item:hover {
+  background: var(--card-bg-2);
+  color: var(--text);
+}
+html[data-theme="light"] .server-item:hover {
+  background: var(--page-bg);
+}
+
+/* ---- stats row (flat row with separators) ---- */
+.stats-row{
+  display:flex;
+  align-items:center;
+  padding:12px 24px 4px;
+  max-width:800px;
+  width:100%;
+  margin:4px auto 0;
+  gap:0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+html[data-theme="light"] .stats-row {
+  background: transparent;
+  box-shadow: none;
+}
+.stat-col{
+  flex:1;
+  text-align:center;
+  padding:6px 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.stat-col:not(:last-child) {
+  border-right: 1px solid var(--hair) !important;
+}
+.stat-label{
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:12px;
+  letter-spacing:-0.01em;
+}
+.stat-label svg{ width:13px; height:13px; }
+.stat-col.ping .stat-label{ color:var(--pink); }
+.stat-col.download .stat-label{ color:var(--blue); }
+.stat-col.upload .stat-label{ color:var(--green); }
+
+.stat-value{
+  font-family:var(--font-display);
+  font-weight:400; /* Regular elegant weight, not bold! */
+  font-size:clamp(22px, 6.2vw, 36px); /* Significantly larger font size */
+  line-height:1.1;
+  letter-spacing:-0.03em;
+  font-variant-numeric:tabular-nums;
+  color:var(--text);
+}
+.stat-value.pending{ color:var(--text-faint); font-weight:400; }
+.stat-unit{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  color:var(--text-faint);
+  letter-spacing:0.04em;
+  margin-top:1px;
+}
+
+.stat-sub{
+  font-family:var(--font-body);
+  font-size:10px;
+  color:var(--text-dim);
+  margin-top:4px;
+  line-height:1.2;
+}
+.stat-sub span {
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-dim);
+  font-weight:400; /* Regular weight, not bold! */
+}
+
+/* ---- dial ---- */
+.dial-section{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
+  padding:0;
+  margin-top:14px;
+  width:100%;
+}
+.dial-wrap{
+  position:relative;
+  width:clamp(220px, 45vmin, 440px);
+  height:clamp(220px, 45vmin, 440px);
+  max-width:100%;
+  cursor:pointer;
+  user-select:none;
+  transform-origin: center center;
+}
+svg.dial{ width:100%; height:100%; display:block; overflow:visible; }
+
+.dial-center{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:4px;
+  pointer-events:none;
+  width:72%;
+  margin:0 auto;
+}
+.connection-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  width: calc(100% - 48px);
+  margin: 20px auto 0;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  z-index: 10;
+}
+html[data-theme="light"] .connection-card {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.info-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  padding: 0 16px;
+}
+.info-item:not(:last-child) {
+  border-right: 1px solid var(--hair) !important;
+  border-bottom: none !important;
+}
+.info-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.info-label svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+.info-val {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 400; /* Flat regular weight */
+}
+.info-divider {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .connection-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .info-divider {
+    display: none;
+  }
+}
+.dial-value-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+.dial-value{
+  font-family:var(--font-display);
+  font-weight:400; /* Regular elegant weight, like fast.com */
+  font-size:clamp(40px, 10vw, 64px); /* Scaled down slightly for refined proportion */
+  letter-spacing:-0.03em;
+  font-variant-numeric:tabular-nums;
+  color:var(--text);
+  line-height:1.05;
+}
+.dial-value.go-text {
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:clamp(34px, 8vw, 48px);
+  letter-spacing:0.04em;
+  color:var(--text);
+  cursor:pointer;
+  line-height:1.2;
+}
+.dial-value.connecting-text {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: clamp(20px, 5.5vw, 28px); /* Smaller, monospaced elegant styling */
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.dial-unit-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 1px;
+}
+.dial-unit {
+  font-family: var(--font-mono);
+  font-size: 18px; /* Enlarged unit measurement label */
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+.dial-divider {
+  width: 90px;
+  height: 1px;
+  background: var(--hair);
+  margin: 8px 0;
+}
+.dial-bottom-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+}
+.dial-state-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.dial-state-arrow {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 600;
+}
+.dial-state-text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.hint {
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 2.8vw, 13px); /* Enlarged tap to test text */
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-top: 2px;
+  transition: color 0.2s ease;
+}
+.dial-wrap:hover .hint { color: var(--blue); }
+
+/* Ripple Ring (Idle state pulse) */
+.ripple-ring {
+  transform-origin: 200px 200px;
+  stroke: var(--blue); /* Beautiful electric blue ripple wave */
+  stroke-width: 3.0px; /* Thicker and more visible stroke */
+  fill: none;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px rgba(0, 122, 255, 0.35)); /* Soft electric glow */
+}
+.ripple-ring.ripple-trigger {
+  animation: dialRipple 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes dialRipple {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.8; /* Higher initial visibility */
+  }
+  100% {
+    transform: scale(1.24); /* Expands further outward */
+    opacity: 0;
+  }
+}
+
+
+
+.privacy-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-faint);
+  text-align: center;
+  margin: 18px auto 0;
+  max-width: 400px;
+  line-height: 1.4;
+  z-index: 5;
+}
+
+/* ---- wave decoration (Stretched & Amplified) ---- */
+.wave-deco{
+  position:relative;
+  height:84px;
+  margin-top:2px;
+  width:100%;
+  overflow:hidden;
+}
+.wave-deco svg{ 
+  position:absolute; 
+  bottom:-4px; 
+  left:-10%; 
+  width:120%;
+  height:100%; 
+}
+.wave-layer{ 
+  animation:driftWave 13s ease-in-out infinite; 
+  transform-origin:center bottom; 
+}
+.wave-layer.l2{ 
+  animation:driftWaveReverse 17s ease-in-out infinite; 
+}
+.wave-layer.l3{ 
+  animation:driftWave 21s ease-in-out infinite; 
+}
+
+/* organic wave swell animation combining translation and scale Y */
+@keyframes driftWave{
+  0%,100%{ transform:translateX(0) scaleY(1.0); }
+  50%{ transform:translateX(-4%) scaleY(1.12); }
+}
+@keyframes driftWaveReverse{
+  0%,100%{ transform:translateX(0) scaleY(1.0); }
+  50%{ transform:translateX(4%) scaleY(1.18); }
+}
+
+footer{
+  text-align:center;
+  font-family:var(--font-body);
+  font-size:10px;
+  color:var(--footer-color);
+  padding:10px 0;
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:2;
+  background:transparent;
+}
+
+/* ---- dialog / modal styling ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: var(--card-bg-1);
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  width: 90%;
+  max-width: 480px;
+  padding: 24px;
+  color: var(--text);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+}
+html[data-theme="light"] .modal-content {
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-family: var(--font-display);
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 24px;
+  cursor: pointer;
+}
+.modal-body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  max-height: 350px;
+  overflow-y: auto;
+}
+.modal-body h3 {
+  margin: 14px 0 6px;
+  color: var(--text);
+  font-size: 14px;
+}
+.modal-body ul {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+.modal-action-btn {
+  background: var(--blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.modal-action-btn:hover {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .wave-layer{ animation:none; }
+}
+
+/* ---- Demo device frame view toggler ---- */
+#deviceWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#deviceWrapper.desktop-mode {
+  width: 100%;
+  height: 100vh;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#deviceWrapper.mobile-mode {
+  width: 375px;
+  height: 780px;
+  border: 12px solid #1c1d22;
+  border-radius: 40px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#deviceWrapper.mobile-mode .app-container {
+  height: 100%;
+  min-height: 100%;
+  border-radius: 28px;
+}
+#deviceWrapper.mobile-mode .dial-section {
+  margin-top: 8px !important;
+}
+#deviceWrapper.mobile-mode .dial-wrap {
+  width: 240px !important;
+  height: 240px !important;
+}
+#deviceWrapper.mobile-mode .dial-center {
+  width: 80% !important;
+  gap: 2px !important;
+}
+#deviceWrapper.mobile-mode .dial-value-wrap {
+  margin-top: 4px !important;
+  gap: 3px !important;
+}
+#deviceWrapper.mobile-mode .dial-value {
+  font-size: 24px !important;
+}
+#deviceWrapper.mobile-mode .dial-unit {
+  font-size: 10px !important;
+}
+#deviceWrapper.mobile-mode .stat-col {
+  padding: 8px 4px !important;
+  gap: 1px !important;
+}
+#deviceWrapper.mobile-mode .stat-label {
+  font-size: 10px !important;
+  gap: 3px !important;
+}
+#deviceWrapper.mobile-mode .stat-label svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+#deviceWrapper.mobile-mode .stat-value {
+  font-size: 18px !important;
+}
+#deviceWrapper.mobile-mode .stat-unit {
+  font-size: 8px !important;
+}
+#deviceWrapper.mobile-mode .stat-sub {
+  font-size: 8px !important;
+  margin-top: 2px !important;
+  line-height: 1.1 !important;
+}
+#deviceWrapper.mobile-mode .stat-sub span {
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  margin-top: 1px !important;
+}
+#deviceWrapper.mobile-mode .stats-row {
+  width: 100% !important;
+  padding: 8px 16px !important;
+  margin: 0 auto !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#deviceWrapper.mobile-mode .stat-col {
+  padding: 4px 6px !important;
+}
+#deviceWrapper.mobile-mode .stat-value {
+  font-size: 20px !important;
+}
+#deviceWrapper.mobile-mode .connection-card {
+  width: calc(100% - 16px) !important;
+  margin-top: 12px !important;
+  padding: 0 !important;
+  flex-direction: row !important;
+}
+#deviceWrapper.mobile-mode .info-item {
+  padding: 0 8px !important;
+}
+#deviceWrapper.mobile-mode .info-val {
+  font-size: 11px !important;
+}
+#deviceWrapper.mobile-mode .hint {
+  font-size: 10px !important;
+  margin-top: 4px !important;
+}
+#deviceWrapper.mobile-mode .brand h1 {
+  font-size: 14px !important;
+}
+#deviceWrapper.mobile-mode .privacy-note {
+  margin-top: 18px !important;
+  font-size: 9.5px !important;
+  padding: 0 16px !important;
+}
+#deviceWrapper.mobile-mode .dial-value.connecting-text {
+  font-size: 14px !important; /* Elegant monospaced sizing inside small mobile dial */
+}
+
+/* Result Card overrides specifically for the mobile device preview container */
+#deviceWrapper.mobile-mode .result-card-container {
+  gap: 12px !important;
+  max-width: 320px !important;
+  width: calc(100% - 24px) !important;
+  top: 50% !important;
+}
+#deviceWrapper.mobile-mode .result-card {
+  padding: 16px !important;
+  gap: 10px !important;
+  border-radius: 12px !important;
+}
+#deviceWrapper.mobile-mode .result-card-speeds {
+  gap: 12px !important;
+  padding-bottom: 12px !important;
+}
+#deviceWrapper.mobile-mode .speed-num {
+  font-size: 24px !important; /* Smaller, sharp digital display */
+}
+#deviceWrapper.mobile-mode .speed-unit-lbl {
+  font-size: 10px !important;
+}
+#deviceWrapper.mobile-mode .card-brand {
+  font-size: 11px !important;
+}
+#deviceWrapper.mobile-mode .card-time {
+  font-size: 9.5px !important;
+}
+#deviceWrapper.mobile-mode .card-stat-lbl {
+  font-size: 9.5px !important;
+}
+#deviceWrapper.mobile-mode .card-stat-val {
+  font-size: 14px !important;
+}
+#deviceWrapper.mobile-mode .conn-lbl {
+  font-size: 10.5px !important;
+}
+#deviceWrapper.mobile-mode .conn-val {
+  font-size: 11px !important;
+}
+#deviceWrapper.mobile-mode .result-actions {
+  gap: 8px !important;
+}
+#deviceWrapper.mobile-mode .result-actions .action-btn {
+  padding: 8px 12px !important;
+  font-size: 10.5px !important;
+}
+
+/* ---- Animation Transitions for Test Finished state ---- */
+.stats-row, .dial-wrap, .connection-card, .privacy-note, #shareBtn {
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.finished-state .stats-row {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateY(-20px);
+}
+.finished-state .dial-wrap {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: scale(0.7) !important;
+}
+.finished-state .connection-card {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+.finished-state .privacy-note {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+.finished-state #shareBtn {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+/* Result Card Container style */
+.result-card-container {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -46%) scale(0.92);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s 0.15s cubic-bezier(0.16, 1, 0.3, 1), display 0.55s;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: calc(100% - 32px);
+  max-width: 420px;
+}
+.finished-state .result-card-container {
+  display: flex;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+.result-card {
+  background: var(--card-bg-1);
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  box-shadow: 0 10px 30px var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+html[data-theme="light"] .result-card {
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.result-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 10px;
+}
+.card-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.card-time {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.result-card-speeds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 16px;
+}
+.speed-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.speed-lbl {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.speed-box.download .speed-lbl { color: var(--blue); }
+.speed-box.upload .speed-lbl { color: var(--green); }
+
+.speed-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.speed-unit-lbl {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text); /* Match ms text color */
+}
+
+.result-card-stats {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 12px;
+}
+.card-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.card-stat-lbl {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.card-stat-val {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.result-card-connection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.connection-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.conn-lbl {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+.conn-val {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+  text-align: right;
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg-1);
+  border: 1px solid var(--hair);
+  color: var(--text-dim);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border-color: var(--text-faint);
+}
+html[data-theme="light"] .action-btn {
+  background: #ffffff;
+  border: 1px solid #c7c7cc; /* High contrast border */
+  color: var(--text-dim); /* High contrast dark grey text */
+}
+html[data-theme="light"] .action-btn:hover {
+  background: #e5e5ea;
+  border-color: #8e8e93;
+  color: #000000;
+}
+
+/* Mobile responsive fixes for result card */
+#deviceWrapper.mobile-mode .result-card {
+  padding: 16px;
+  gap: 12px;
+}
+#deviceWrapper.mobile-mode .speed-num {
+  font-size: 26px;
+}
+#deviceWrapper.mobile-mode .action-btn {
+  padding: 8px 12px;
+  font-size: 11px;
+}
