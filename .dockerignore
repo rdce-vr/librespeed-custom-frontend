@@ -3,4 +3,3 @@
 docker-compose.yml
 README.md
 Dockerfile
-default.conf.template
