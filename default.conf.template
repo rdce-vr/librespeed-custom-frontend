@@ -22,17 +22,33 @@ server {
         try_files /index.html =404;
     }
 
-    location / {
-        try_files $uri $uri/ @backend;
+    # ==============================
+    # LIBRESPEED FRONTEND ASSETS
+    # ==============================
+
+    location = /speedtest.js {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/speedtest.js;
+        proxy_set_header Host $proxy_host;
     }
 
-    # Fallback backend handler for missing assets (like speedtest.js, logo.svg, etc.)
-    location @backend {
-        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
+    location = /speedtest_worker.js {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/speedtest_worker.js;
         proxy_set_header Host $proxy_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location = /server-list.json {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/server-list.json;
+        proxy_set_header Host $proxy_host;
+    }
+
+    location /images/ {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/images/;
+        proxy_set_header Host $proxy_host;
+    }
+
+    location /fonts/ {
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT}/fonts/;
+        proxy_set_header Host $proxy_host;
     }
 
     # ==============================
@@ -46,5 +62,10 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Serve custom files and CSS locally
+    location / {
+        try_files $uri $uri/ =404;
     }
 }
