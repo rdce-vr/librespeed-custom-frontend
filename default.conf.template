@@ -39,7 +39,7 @@ server {
     # LIBRESPEED TEST API
     # ==============================
 
-    location ~ ^/(empty|garbage|getIP|telemetry)\.php$ {
+    location ~ ^/(backend/)?(empty|garbage|getIP|telemetry)\.php$ {
         proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
         
         proxy_set_header Host $host;
