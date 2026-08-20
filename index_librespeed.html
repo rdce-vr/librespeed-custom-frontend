@@ -763,10 +763,25 @@
     const loadedPingsUp = [];
     let lastState = -1;
 
+    function isPrivateIp(ip) {
+      if (!ip) return true;
+      const cleanIp = ip.trim().split(' ')[0];
+      if (cleanIp.startsWith('127.') || cleanIp.startsWith('10.') || cleanIp.startsWith('192.168.')) return true;
+      if (cleanIp.startsWith('172.')) {
+        const parts = cleanIp.split('.');
+        if (parts.length >= 2) {
+          const second = parseInt(parts[1], 10);
+          if (second >= 16 && second <= 31) return true;
+        }
+      }
+      if (cleanIp === '::1' || cleanIp.startsWith('fe80:') || cleanIp.startsWith('fc00:') || cleanIp.startsWith('fd00:')) return true;
+      return false;
+    }
+
     s.onupdate = function(data) {
       const state = data.testState; // 0 starting, 1 download, 2 ping/jitter, 3 upload, 4 finished, 5 aborted
       
-      if (data.clientIp) {
+      if (data.clientIp && !isPrivateIp(data.clientIp)) {
         ipLine.textContent = data.clientIp;
       }
       
