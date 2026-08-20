@@ -223,7 +223,7 @@
       </div>
       
       <div class="result-card-connection">
-        <div class="connection-row">
+        <div class="connection-row" style="display: none;">
           <span class="conn-lbl">Location</span>
           <span class="conn-val" id="cardLoc">—</span>
         </div>
@@ -238,6 +238,10 @@
       <button class="action-btn" id="copyImgBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:6px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy Image
+      </button>
+      <button class="action-btn" id="shareBtn" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:6px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+        Share
       </button>
       <button class="action-btn" id="backBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:6px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -322,7 +326,7 @@
         </div>
         
         <div class="result-card-connection">
-          <div class="connection-row">
+          <div class="connection-row" style="display: none;">
             <span class="conn-lbl">Location</span>
             <span class="conn-val" id="modalCardLoc">—</span>
           </div>
@@ -636,12 +640,30 @@
 
   // ---- Share Action Logic ----
   const shareBtn = $('shareBtn');
+  const shareModal = $('shareModal');
+  const closeShareBtn = $('closeShareBtn');
   
-  if (shareBtn) {
+  if (shareBtn && shareModal) {
     shareBtn.addEventListener('click', () => {
-      document.querySelector('.app-container').classList.add('finished-state');
+      shareModal.style.display = 'flex';
     });
   }
+  
+  if (closeShareBtn && shareModal) {
+    closeShareBtn.addEventListener('click', () => {
+      shareModal.style.display = 'none';
+    });
+  }
+  
+  // Close modals when clicking outside their contents
+  window.addEventListener('click', (e) => {
+    if (e.target === shareModal) {
+      shareModal.style.display = 'none';
+    }
+    if (e.target === privacyModal) {
+      privacyModal.style.display = 'none';
+    }
+  });
 
   // ---- Real Speedtest.js Execution ----
   let dlVisualDelayUntil = 0;
