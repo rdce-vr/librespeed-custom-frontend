@@ -385,6 +385,7 @@
       .then(res => res.json())
       .then(data => {
         if (data.ip) {
+          window.resolvedPublicIp = data.ip;
           ipLine.textContent = `${data.ip} · ${data.org}`;
         }
       })
@@ -766,7 +767,7 @@
     function isPrivateIp(ip) {
       if (!ip) return true;
       const cleanIp = ip.trim().split(' ')[0];
-      if (cleanIp.startsWith('127.') || cleanIp.startsWith('10.') || cleanIp.startsWith('192.168.')) return true;
+      if (cleanIp.startsWith('127.') || cleanIp.startsWith('10.') || cleanIp.startsWith('192.')) return true;
       if (cleanIp.startsWith('172.')) {
         const parts = cleanIp.split('.');
         if (parts.length >= 2) {
@@ -781,8 +782,13 @@
     s.onupdate = function(data) {
       const state = data.testState; // 0 starting, 1 download, 2 ping/jitter, 3 upload, 4 finished, 5 aborted
       
-      if (data.clientIp && !isPrivateIp(data.clientIp)) {
-        ipLine.textContent = data.clientIp;
+      if (data.clientIp) {
+        const cleanIp = data.clientIp.trim().split(' ')[0];
+        const isMatchedPublic = window.resolvedPublicIp && (cleanIp === window.resolvedPublicIp);
+        const isNotPrivate = !window.resolvedPublicIp && !isPrivateIp(data.clientIp);
+        if (isMatchedPublic || isNotPrivate) {
+          ipLine.textContent = data.clientIp;
+        }
       }
       
       if (state === 0) {
