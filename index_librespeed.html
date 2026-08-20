@@ -403,7 +403,7 @@
       .catch(err => {
         console.warn('Failed to load server-list.json, falling back to local host:', err);
         const localServer = {
-          name: "Local Server",
+          name: "RDCE-VR Server",
           server: window.location.origin + "/",
           dlURL: "garbage.php",
           ulURL: "empty.php",
@@ -432,15 +432,19 @@
       listEl.appendChild(li);
     });
     
+    const selectorContainer = document.querySelector('.server-selector-container');
     if (serverList.length > 1) {
       selectServer(serverList[0]);
       $('chevron').style.display = 'block';
+      if (selectorContainer) selectorContainer.style.display = 'block';
     } else if (serverList.length === 1) {
       selectServer(serverList[0]);
       $('chevron').style.display = 'none';
+      if (selectorContainer) selectorContainer.style.display = 'none';
     } else {
       $('selectedServerName').textContent = 'No servers available';
       $('chevron').style.display = 'none';
+      if (selectorContainer) selectorContainer.style.display = 'none';
     }
   }
 
@@ -813,6 +817,7 @@
           setDial(0, 'Mb/s');
           $('dialArrow').textContent = '';
           $('dialUnitWrap').style.display = 'none';
+          lastState = state;
           return;
         }
         
@@ -868,6 +873,7 @@
           setDial(0, 'Mb/s');
           $('dialArrow').textContent = '';
           $('dialUnitWrap').style.display = 'none';
+          lastState = state;
           return;
         }
         
@@ -884,6 +890,7 @@
         $('dialStateWrap').style.display = 'flex';
         $('dialArrow').textContent = '↑';
         $('dialArrow').style.color = 'var(--green)';
+        $('dialStateText').textContent = 'sending data';
         
         const ulSpeed = parseFloat(data.ulStatus) || 0;
         setDial(ulSpeed, 'Mb/s');
