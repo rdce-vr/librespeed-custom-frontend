@@ -1,9 +1,7 @@
 FROM nginx:alpine
 
-COPY default.conf.template /etc/nginx/templates/default.conf.template
-
-ENV BACKEND_HOST=speedtest
-ENV BACKEND_PORT=80
+# Copy static Nginx configuration directly to conf.d, overwriting default config
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 RUN rm -rf /usr/share/nginx/html/*
 
