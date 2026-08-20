@@ -9,6 +9,19 @@ server {
     # YOUR CUSTOM FRONTEND & STATIC FALLBACK
     # ==============================
 
+    # Force serving our custom index.html for root, index.php, or index.html
+    location = / {
+        try_files /index.html =404;
+    }
+
+    location = /index.php {
+        try_files /index.html =404;
+    }
+
+    location = /index.html {
+        try_files /index.html =404;
+    }
+
     location / {
         try_files $uri $uri/ @backend;
     }
