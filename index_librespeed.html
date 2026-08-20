@@ -401,9 +401,17 @@
         populateServerSelector();
       })
       .catch(err => {
-        console.error('Failed to load server list:', err);
-        $('selectedServerName').textContent = 'Error loading servers';
-        locLine.textContent = 'Server List Offline';
+        console.warn('Failed to load server-list.json, falling back to local host:', err);
+        const localServer = {
+          name: "Local Server",
+          server: window.location.origin + "/",
+          dlURL: "garbage.php",
+          ulURL: "empty.php",
+          pingURL: "empty.php",
+          getIpURL: "getIP.php"
+        };
+        serverList = [localServer];
+        populateServerSelector();
       });
   }
 

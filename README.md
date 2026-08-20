@@ -41,7 +41,7 @@ A pre-configured [`docker-compose.yml`](file:///C:/Users/kreshna.putra/.gemini/a
 services:
   # 1. Custom High-Contrast Apple-HIG Frontend (serves on public port 8378)
   librespeed-frontend:
-    image: ghcr.io/<your-github-username>/librespeed-custom-frontend:latest
+    image: docker.io/trans19/librespeed-custom-frontend:latest
     container_name: librespeed-frontend
     ports:
       - "8378:80" # Map host port 8378 to nginx port 80 (Drop-in replacement for the old web address!)
